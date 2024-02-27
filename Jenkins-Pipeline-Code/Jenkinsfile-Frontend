@@ -27,8 +27,8 @@ pipeline {
                 dir('Application-Code/frontend') {
                     withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=three-tier-frontend \
-                        -Dsonar.projectKey=three-tier-frontend '''
+                        -Dsonar.projectName=Three-tier-Frontend \
+                        -Dsonar.projectKey=Three-tier-Frontend '''
                     }
                 }
             }
@@ -47,13 +47,13 @@ pipeline {
                 }
             }
         }
-        stage("Docker Image Build") {
+          stage("Docker Image Build") {
             steps {
                 script {
                     dir('Application-Code/frontend') {
-                            sh 'docker system prune -f'
-                            sh 'docker container prune -f'
-                            sh 'docker build -t ${AWS_ECR_REPO_NAME} .'
+                        sh 'docker system prune -f'
+                        sh 'docker container prune -f'
+                        sh "docker build -t ${REPOSITORY_URI}."
                     }
                 }
             }
@@ -61,9 +61,14 @@ pipeline {
         stage("ECR Image Pushing") {
             steps {
                 script {
-                        sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
-                        sh "docker tag ${AWS_ECR_REPO_NAME} ${REPOSITORY_URI}:${BUILD_NUMBER}"
-                        sh "docker push ${REPOSITORY_URI}:${BUILD_NUMBER}"
+                    // Authenticate with ECR
+                    sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}"
+
+                    // Tag the local Docker image
+                    sh "docker tag ${REPOSITORY_URI} ${AWS_ECR_REPO_NAME}/${REPOSITORY_URI}:${BUILD_NUMBER}"
+
+                    // Push the tagged Docker image to ECR
+                    sh "docker push ${REPOSITORY_URI}:${BUILD_NUMBER}"
                 }
             }
         }
