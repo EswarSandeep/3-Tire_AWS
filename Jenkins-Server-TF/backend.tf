@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = "tire4"
+    bucket         = "tire3s3"
     region         = "us-west-1"
     key            = "End-to-End-Kubernetes-Three-Tier-DevSecOps-Project/Jenkins-Server-TF/terraform.tfstate"
-    dynamodb_table = "tire3-ke"
+    dynamodb_table = "tire3"
     encrypt        = true
   }
   required_version = ">=0.13.0"
