@@ -74,3 +74,18 @@ sudo apt install trivy -y
 # Intalling Helm
 #! /bin/bash
 sudo snap install helm --classic
+
+sudo su
+# Check if the script is running as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This script must be run as root" 1>&2
+    exit 1
+fi
+# Modify sshd_config file
+echo "Modifying sshd_config file..."
+echo "ClientAliveInterval 60" >> /etc/ssh/sshd_config
+echo "ClientAliveCountMax 3" >> /etc/ssh/sshd_config
+# Restart SSH service to apply changes
+echo "Restarting SSH service..."
+service ssh restart
+echo "Changes applied successfully!"
