@@ -27,8 +27,8 @@ pipeline {
                 dir('Application-Code/frontend') {
                     withSonarQubeEnv('sonar-server') {
                         sh ''' $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=three-tire-frontend \
-                        -Dsonar.projectKey=three-tire-frontend '''
+                        -Dsonar.projectName=three-tier-frontend \
+                        -Dsonar.projectKey=three-tier-frontend '''
                     }
                 }
             }
@@ -47,13 +47,13 @@ pipeline {
                 }
             }
         }
-          stage("Docker Image Build") {
+        stage("Docker Image Build") {
             steps {
                 script {
                     dir('Application-Code/frontend') {
                             sh 'docker system prune -f'
                             sh 'docker container prune -f'
-                            sh 'docker build -t my-image .'
+                            sh 'docker build -t my-imagef .'
                     }
                 }
             }
@@ -62,12 +62,12 @@ pipeline {
              steps {
               script {
                 withCredentials([
-               [$class: 'AmazonWebServicesCredentialsBinding',accessKeyVariable: 'AWS_ACCESS_KEY_ID',credentialsId: 'aws-key',secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {    
+               [$class: 'AmazonWebServicesCredentialsBinding',accessKeyVariable: 'AWS_ACCESS_KEY_ID',credentialsId: 'aws_key',secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {    
                  sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
             
                // Tag Docker image with Jenkins build ID
                 def imageTag = env.BUILD_ID
-                sh "docker tag my-image:latest ${REPOSITORY_URI}:${imageTag}"
+                sh "docker tag my-imagef:latest ${REPOSITORY_URI}:${imageTag}"
             
                // Push Docker image with Jenkins build ID as tag
                 sh "docker push ${REPOSITORY_URI}:${imageTag}"
