@@ -44,6 +44,7 @@ pipeline {
             steps {
                 dir('Application-Code/frontend') {
                     sh 'trivy fs . > trivyfs.txt'
+                    sh "trivy fs --format table -o trivy-fs-report.html ."
                 }
             }
         }
